@@ -174,7 +174,7 @@ value ocaml_dispatch_get_main_queue(value unit)
   CAMLlocal1(v_queue);
   dispatch_queue_t main_q = dispatch_get_main_queue();
 
-  v_queue = caml_alloc_custom(&queue_ops, sizeof(dispatch_queue_t), 0, 1);
+  v_queue = caml_alloc_custom_mem(&queue_ops, sizeof(dispatch_queue_t *), sizeof(dispatch_queue_t));
   Queue_val(v_queue) = main_q;
 
   CAMLreturn(v_queue);
@@ -268,6 +268,50 @@ value ocaml_dispatch_read(value v_queue, value v_channel, value v_length, value 
     return;
   });
 
+  CAMLreturn(Val_unit);
+}
+
+value ocaml_dispatch_with_read(value v_queue, value v_channel, value v_g, value v_f, value v_err)
+{
+  CAMLparam5(v_queue, v_g, v_channel, v_f, v_err);
+  dispatch_queue_t queue = Queue_val(v_queue);
+  dispatch_group_t g = Group_val(v_g);
+  dispatch_group_enter(g);
+  dispatch_io_read(Channel_val(v_channel), 0, SIZE_MAX, queue, ^(bool done, dispatch_data_t data, int error) {
+    int res = caml_c_thread_register();
+    caml_acquire_runtime_system();
+
+    if (error)
+    {
+      caml_callback(v_err, Val_unit);
+      dispatch_group_leave(g);
+      if (res != 0)
+        caml_c_thread_unregister();
+      caml_release_runtime_system();
+      return;
+    }
+
+    if (data)
+    {
+      CAMLlocal1(v_data);
+      v_data = caml_alloc_custom_mem(&group_ops, sizeof(dispatch_data_t *), sizeof(dispatch_data_t));
+      Data_val(v_data) = data;
+      caml_callback(v_f, v_data);
+    }
+
+    if (done)
+    {
+      dispatch_io_close(Channel_val(v_channel), 0);
+      dispatch_group_leave(g);
+    }
+
+    caml_release_runtime_system();
+
+    if (res != 0)
+      caml_c_thread_unregister();
+
+    return;
+  });
   CAMLreturn(Val_unit);
 }
 

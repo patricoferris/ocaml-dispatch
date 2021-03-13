@@ -9,6 +9,11 @@
  (libraries cmdliner dispatchcp_lib fmt logs logs.cli logs.fmt fmt.tty
    fmt.cli))
 
+(executable
+ (name lwtcp)
+ (modules lwtcp)
+ (libraries cmdliner lwtcp_lib fmt logs logs.cli logs.fmt fmt.tty fmt.cli))
+
 (library
  (name lwtcp_lib)
  (modules lwtcp_lib)

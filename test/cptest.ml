@@ -11,7 +11,7 @@ let fill_file_with_random ~count dst =
   let count = Fmt.strf "count=%d" count in
   Cmd.(v "dd" % "if=/dev/urandom" % ofile % "bs=27k" % count) |> OS.Cmd.run
 
-let block_size = 32 * 1024 * 1024 / 2
+let block_size = 1024
 let queue_depth = 64
 let count = 50000
 
@@ -23,8 +23,8 @@ let run_cp_test impl ~block_size ~queue_depth count =
   >>= fun () ->
   impl block_size queue_depth fname_in fname_out ();
   (* TODO check they are the same file *)
-  (* at_exit (fun () -> try Sys.remove fname_in with _ -> ()); *)
-  (* Sys.remove fname_out; *)
+  at_exit (fun () -> try Sys.remove fname_in with _ -> ());
+  Sys.remove fname_out;
   Ok ()
 
 open Bechamel
@@ -34,7 +34,7 @@ let run_test impl ~block_size ~queue_depth count =
   Staged.stage @@ fun () -> run_cp_test impl ~block_size ~queue_depth count
 
 let test_size impl =
-  Test.make_indexed ~name:"size" ~fmt:"%s %d" ~args:[ 10000 ]
+  Test.make_indexed ~name:"size" ~fmt:"%s %d" ~args:[ 50000 ]
     (run_test impl ~block_size ~queue_depth)
 
 (* let test_queue_depth impl =
@@ -64,7 +64,7 @@ let benchmark () =
     Instance.[ minor_allocated; major_allocated; monotonic_clock ]
   in
   let cfg =
-    Benchmark.cfg ~limit:5000 ~quota:(Time.second 0.5) ~kde:(Some 1000) ()
+    Benchmark.cfg ~limit:10 ~quota:(Time.second 0.5) ~kde:(Some 1000) ()
   in
   let raw_results = Benchmark.all cfg instances test in
   let results =

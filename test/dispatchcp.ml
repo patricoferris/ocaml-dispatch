@@ -22,9 +22,7 @@ let cmd =
   let block_size =
     let doc = "Block size per chunk in bytes" in
     Arg.(
-      value
-      & opt int (32 * 1024 * 1024 * 1024)
-      & info [ "block-size" ] ~docv:"BYTES" ~doc)
+      value & opt int (1024 * 1024) & info [ "block-size" ] ~docv:"BYTES" ~doc)
   in
   let queue_depth =
     let doc = "Number of async requests in parallel" in
