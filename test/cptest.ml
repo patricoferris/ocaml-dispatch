@@ -34,7 +34,7 @@ let run_test impl ~block_size ~queue_depth count =
   Staged.stage @@ fun () -> run_cp_test impl ~block_size ~queue_depth count
 
 let test_size impl =
-  Test.make_indexed ~name:"size" ~fmt:"%s %d" ~args:[ 50000 ]
+  Test.make_indexed ~name:"size" ~fmt:"%s %d" ~args:[ 15000 ]
     (run_test impl ~block_size ~queue_depth)
 
 (* let test_queue_depth impl =
