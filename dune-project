@@ -14,3 +14,18 @@
   (logs :with-test)
   (fmt :with-test)
   (cmdliner :with-test)))
+(package
+ (name dispatch-bench)
+ (synopsis "Small benchmarks for GCD")
+ (description
+  "A package for testing various GCD programs and counter parts written in other libraries.")
+ (depends
+  (notty (>= 0.2.2))
+  (lwt (>= 5.4.0))
+  (logs (>= 0.7.0))
+  (fmt (>= 0.8.9))
+  (cmdliner (>= 1.0.4))
+  (bos (>= 0.2.0))
+  (bechamel-notty (>= 0.1.0))
+  (bechamel (>= 0.1.0))
+  dispatch))
