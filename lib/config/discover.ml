@@ -6,7 +6,10 @@ let () =
         {
           libs =
             [
-              "-L" ^ C.ocaml_config_var_exn c "standard_library"; "-lthreadsnat";
+              "-L" ^ C.ocaml_config_var_exn c "standard_library";
+              "-lthreadsnat";
+              "-lunix";
+              "-ObjC";
             ];
           cflags = [];
         }

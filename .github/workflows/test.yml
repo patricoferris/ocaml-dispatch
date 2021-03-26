@@ -23,3 +23,5 @@ jobs:
       run: opam install -t -y . --deps-only
     - name: Building, Installing and Testing
       run: opam exec -- dune build @install @runtest
+    - name: File copying test
+      run: opam exec -- dune exec ./test/cptest.exe
